@@ -1,0 +1,39 @@
+import java.lang.reflect.Field
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        maven {
+            url 'https://maven.aliyun.com/repository/public/'
+        }
+        maven {url 'https://maven.aliyun.com/nexus/content/groups/public/'}
+        maven { url 'https://jitpack.io' }
+        google()
+        mavenCentral()
+        jcenter() // Warning: this repository is going to shut down soon
+    }
+}
+//加载本地配置文件
+Properties properties = new Properties()
+def propertiesFilePath = "${rootProject.getProjectDir().getAbsolutePath()}${File.separator}module_load.properties"
+println "propertiesFilePath = $propertiesFilePath"
+def  propertiesFile = new File(propertiesFilePath)
+properties.load( propertiesFile.newDataInputStream())
+
+def lib2LoadState =  properties.getProperty("lib2Load")
+def isLib2Load = Boolean.parseBoolean(lib2LoadState)
+println "lib2LoadState = $lib2LoadState  isload = ${isLib2Load == true}"
+
+rootProject.name = "CodeMultipleChannelAutoload"
+include ':app'
+include ':app2'
+
+include ':lib1'
+if(isLib2Load){
+    include ':lib2'
+}
+
+include ':lib3'
+
+
+
