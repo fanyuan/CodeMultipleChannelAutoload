@@ -1,0 +1,82 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        applicationId "com.sample.app2.autoload"
+        minSdk 21
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        flavorDimensions "versionCode"
+    }
+    dataBinding{
+        enabled true
+    }
+    productFlavors {
+        stage {}
+        dev {}
+        prod {}
+    }
+    buildTypes {
+        debug{
+        }
+        release {
+            signingConfig = signingConfigs.debug
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    //this.rootProject.file('module_load.properties')
+    def propertiesFile = rootProject.file("module_load.properties")
+    //加载本地配置文件
+    Properties properties = new Properties()
+    properties.load(propertiesFile.newDataInputStream())
+    def lib2LoadState =  properties.getProperty("lib2Load")
+    def isLib2Load =  Boolean.parseBoolean(lib2LoadState)
+    if(isLib2Load){
+        //implementation project(':lib2')
+        implementation project(path: ':lib2')
+    }else {
+        //implementation files('aar/lib2-dev-debug.aar')
+
+        //devDebugImplementation files('aar/lib2-dev-debug.aar')
+        //devReleaseImplementation files('aar/lib2-dev-release.aar')
+        //devImplementation files('aar/lib2-dev-debug.aar')
+        devImplementation files('../aar/lib2-dev-release.aar')
+
+        //prodDebugImplementation files('aar/lib2-prod-debug.aar')
+        //prodReleaseImplementation files("aar/lib2-prod-release.aar")
+        //prodImplementation files('aar/lib2-prod-debug.aar')
+        prodImplementation files('../aar/lib2-prod-release.aar')
+
+        //stageDebugImplementation files("aar/lib2-stage-debug.aar")
+        //stageReleaseImplementation files("aar/lib2-stage-release.aar")
+        //stageImplementation files("aar/lib2-stage-debug.aar")
+        stageImplementation files("../aar/lib2-stage-release.aar")
+    }
+
+
+
+
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+}
